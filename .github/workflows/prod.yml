@@ -28,5 +28,20 @@ jobs:
           file: Dockerfile
           push: true
           tags: manojofficialmj/todoapp:${{ github.sha }}
+      
+      - name: Clone staging-ops repo, update image tags, and push tags
+        env:
+          PAT: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        run: |
+          git clone https://github.com/BCAPATHSHALA/argocd.git
+          cd argocd
+
+          sed -i 's|image: manojofficialmj/todoapp:.*|image: manojofficialmj/todoapp:${{ github.sha }}|' manifest.yml
+
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Update todoapp image tags to ${{ github.sha }}"
+          git push https://${PAT}@github.com/BCAPATHSHALA/argocd.git main
           
       
